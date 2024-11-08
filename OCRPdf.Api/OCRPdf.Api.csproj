@@ -2,16 +2,17 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<NoWarn>$(NoWarn);CA1416</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Ghostscript.NET" Version="1.2.3.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.1" />
 		<PackageReference Include="PDFsharp" Version="6.1.1" />
+		<PackageReference Include="Spire.PDF" Version="10.11.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.10" />
 		<PackageReference Include="Tesseract" Version="5.2.0" />
@@ -20,5 +21,4 @@
 	<ItemGroup>
 		<ProjectReference Include="..\OCRPdf.Service\OCRPdf.Service.csproj" />
 	</ItemGroup>
-
 </Project>
