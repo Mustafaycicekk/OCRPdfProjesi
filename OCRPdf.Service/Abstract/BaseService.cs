@@ -11,12 +11,18 @@ public class BaseService<TRepository, TEntity> : IBaseService<TEntity> where TRe
 
 	public ServiceResponse<TEntity> Add(TEntity entity) {
 		try {
-			int affectedRows = Repository.Add(entity);
-			if (affectedRows > 0) { return ServiceResponse<TEntity>.SuccessResponse(entity); }
-			else { return ServiceResponse<TEntity>.ErrorResponse("Data Eklenemedi"); }
+			int id = Repository.Add(entity); 
+			if(id > 0) {
+				typeof(TEntity).GetProperty("ID")?.SetValue(entity, id);
+				return ServiceResponse<TEntity>.SuccessResponse(entity);
+			} else {
+				return ServiceResponse<TEntity>.ErrorResponse("Data eklenemedi");
+			}
+		} catch(Exception ex) {
+			return ServiceResponse<TEntity>.ErrorResponse(ex.Message);
 		}
-		catch (Exception ex) { return ServiceResponse<TEntity>.ErrorResponse(ex.Message); }
 	}
+
 
 
 	public ServiceResponse<TEntity> Delete(int id) {

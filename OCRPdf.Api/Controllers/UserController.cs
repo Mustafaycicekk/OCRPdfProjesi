@@ -43,13 +43,13 @@ public class UserController(IServiceProvider serviceProvider, IConfiguration con
 	}
 	[HttpOptions]
 	public ServiceResponse<IEnumerable<User>> GetAll() {
-		UserService? userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
+		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
 		ServiceResponse<IEnumerable<User>> userGetAll = userService.GetAll();
 		return userGetAll;
 	}
 	[HttpOptions]
 	public ServiceResponse<IEnumerable<User>> Filter(Dictionary<string, object> filters) {
-		UserService? userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
+		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
 		ServiceResponse<IEnumerable<User>> userFiltered = userService.Filter(filters);
 		return userFiltered;
 	}

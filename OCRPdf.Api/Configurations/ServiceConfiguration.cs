@@ -75,6 +75,9 @@ namespace OCRPdf.Api.Configurations {
 			services.AddScoped<UserRepository>();
 			services.AddScoped<UserService>();
 			services.AddScoped<BaseService<UserRepository, User>>();
+			services.AddScoped<OptimizasyonRepository>();
+			services.AddScoped<OptimizasyonService>();
+			services.AddScoped<BaseService<OptimizasyonRepository, Optimizasyon>>();
 
 			// CORS Ayarları
 			services.AddCors(options => {
