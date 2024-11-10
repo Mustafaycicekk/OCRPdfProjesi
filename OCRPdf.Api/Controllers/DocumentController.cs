@@ -8,12 +8,11 @@ using Spire.Pdf;
 using Spire.Pdf.Graphics;
 using System.Drawing;
 using static OCRPdf.Helpers.PdfExtractionHelper;
+namespace OCRPdf.Api.Controllers;
 
-[ApiController]
-[Route("[controller]/[action]")]
+[ApiController, Route("[controller]/[action]")]
 public class PdfController(IServiceProvider serviceProvider) : ControllerBase {
 	private readonly IServiceProvider ServiceProvider = serviceProvider;
-
 
 	[HttpPost]
 	public ServiceResponse<object> ReadToPdfFile(IFormFile file) {

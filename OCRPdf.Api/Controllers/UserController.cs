@@ -19,25 +19,25 @@ public class UserController(IServiceProvider serviceProvider, IConfiguration con
 	[HttpPost]
 	public ServiceResponse<User> Add(User user) {
 		user.PASSWORD = BcryptHasher.HashPassword(user.PASSWORD);
-		UserService? userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
+		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
 		ServiceResponse<User> userAdded = userService.Add(user);
 		return userAdded;
 	}
 	[HttpDelete]
 	public ServiceResponse<User> Delete(int id) {
-		UserService? userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
+		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
 		ServiceResponse<User> userDeleted = userService.Delete(id);
 		return userDeleted;
 	}
 	[HttpPut]
 	public ServiceResponse<User> Update(User user) {
-		UserService? userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
+		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
 		ServiceResponse<User> userUpdated = userService.Update(user);
 		return userUpdated;
 	}
 	[HttpGet]
 	public ServiceResponse<User> Get(int id) {
-		UserService? userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
+		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
 		ServiceResponse<User> userGet = userService.GetById(id);
 		return userGet;
 	}
@@ -58,7 +58,7 @@ public class UserController(IServiceProvider serviceProvider, IConfiguration con
 		using SqlConnection connection = new(connectionString);
 		string query = "SELECT * FROM [User] WHERE EMAIL = @Email";
 		await connection.OpenAsync();
-		User? user = await connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
+		User user = await connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
 		if (user == null) { return ServiceResponse<User>.ErrorResponse("Kullanýcý bulunamadý"); }
 		bool isPasswordValid = BcryptHasher.VerifyPassword(password, user.PASSWORD);
 		if (!isPasswordValid) { return ServiceResponse<User>.ErrorResponse("Geçersiz þifre"); }
