@@ -2,12 +2,8 @@
 using OCRPdf.Repository.Abstract;
 
 namespace OCRPdf.Service.Abstract;
-public class BaseService<TRepository, TEntity> : IBaseService<TEntity> where TRepository : IRepository<TEntity>, new() where TEntity : class, new() {
-	protected TRepository Repository { get; set; }
-	//public BaseService() { Repository = new TRepository();  }
-	public BaseService(TRepository repository) {
-		Repository = repository ?? throw new ArgumentNullException(nameof(repository));
-	}
+public class BaseService<TRepository, TEntity>(TRepository repository) : IBaseService<TEntity> where TRepository : IRepository<TEntity>, new() where TEntity : class, new() {
+	protected TRepository Repository { get; set; } = repository ?? throw new ArgumentNullException(nameof(repository));
 
 	public ServiceResponse<TEntity> Add(TEntity entity) {
 		try {
@@ -22,8 +18,6 @@ public class BaseService<TRepository, TEntity> : IBaseService<TEntity> where TRe
 			return ServiceResponse<TEntity>.ErrorResponse(ex.Message);
 		}
 	}
-
-
 
 	public ServiceResponse<TEntity> Delete(int id) {
 		try {
@@ -54,7 +48,7 @@ public class BaseService<TRepository, TEntity> : IBaseService<TEntity> where TRe
 
 	public ServiceResponse<TEntity> Update(TEntity entity) {
 		try {
-			int affectedRows = Repository.Update(entity);
+			int affectedRows = Repository.Update<TEntity>(entity);
 			if (affectedRows > 0) { return ServiceResponse<TEntity>.SuccessResponse(entity); }
 			else { return ServiceResponse<TEntity>.ErrorResponse("Güncellenemedi"); }
 		}
@@ -67,4 +61,14 @@ public class BaseService<TRepository, TEntity> : IBaseService<TEntity> where TRe
 		}
 		catch (Exception ex) { return ServiceResponse<IEnumerable<TEntity>>.ErrorResponse(ex.Message); }
 	}
+	public ServiceResponse<IEnumerable<TEntity>> GetColumns(IEnumerable<string> columnNames) {
+		try {
+			IEnumerable<TEntity> entities = Repository.GetColumns(columnNames);
+			return ServiceResponse<IEnumerable<TEntity>>.SuccessResponse(entities);
+		}
+		catch (Exception ex) {
+			return ServiceResponse<IEnumerable<TEntity>>.ErrorResponse(ex.Message);
+		}
+	}
+
 }

@@ -6,8 +6,7 @@ using static Dapper.SqlMapper;
 
 namespace OCRPdf.Repository.Abstract;
 public class DapperRepository<T>(IDbConnection dbConnection) : IRepository<T> where T : class {
-	private readonly IDbConnection DbConnection = dbConnection;
-
+	protected readonly IDbConnection DbConnection = dbConnection;
 
 	public int Add<TEntity>(TEntity entity) {
 		string query = GenerateInsertQuery<TEntity>();
@@ -15,30 +14,33 @@ public class DapperRepository<T>(IDbConnection dbConnection) : IRepository<T> wh
 	}
 
 	public int Delete(int id) {
-		string query = $"DELETE FROM [{typeof(T).Name}] WHERE ID = @Id";
+		string tableName = typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name;
+		string query = $"DELETE FROM [{tableName}] WHERE ID = @Id";
 		return DbConnection.Execute(query, new { Id = id });
 	}
 
 	public IEnumerable<T> GetAll() {
-		string query = $"SELECT * FROM [{typeof(T).Name}]";
+		string tableName = typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name;
+		string query = $"SELECT * FROM [{tableName}]";
 		return DbConnection.Query<T>(query);
 	}
 
 	public T GetById(int id) {
-		string query = $"SELECT * FROM [{typeof(T).Name}] WHERE ID = @Id";
+		string tableName = typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name;
+		string query = $"SELECT * FROM [{tableName}] WHERE ID = @Id";
 		return DbConnection.QueryFirstOrDefault<T>(query, new { Id = id });
 	}
 
-	public int Update(T entity) {
-		string query = GenerateUpdateQuery();
+	public int Update<TEntity>(T entity) {
+		string query = GenerateUpdateQuery<TEntity>();
 		return DbConnection.Execute(query, entity);
 	}
 	public IEnumerable<T> Filter(Dictionary<string, object> filters) {
-		string tableName = typeof(T).Name;
+		string tableName = typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name;
 		List<string> conditions = [];
 		DynamicParameters parameters = new();
 
-		foreach(KeyValuePair<string, object> filter in filters) {
+		foreach (KeyValuePair<string, object> filter in filters) {
 			conditions.Add($"{filter.Key} = @{filter.Key}");
 			parameters.Add(filter.Key, filter.Value);
 		}
@@ -47,23 +49,30 @@ public class DapperRepository<T>(IDbConnection dbConnection) : IRepository<T> wh
 		string query = $"SELECT * FROM [{tableName}] {whereClause}";
 		return DbConnection.Query<T>(query, parameters);
 	}
-	private static string GenerateInsertQuery<TEntity>() {
-		string tableName = typeof(TEntity).Name;
-		PropertyInfo[] properties = typeof(TEntity).GetProperties();
-		IEnumerable<PropertyInfo> columns = properties.Where(p => p.Name != "ID");
-
-		string columnNames = string.Join(", ", columns.Select(p => {
-			ColumnAttribute columnAttr = p.GetCustomAttribute<ColumnAttribute>();
-			return columnAttr != null ? columnAttr.Name : p.Name;
-		}));
-		string parameterNames = string.Join(", ", columns.Select(p => "@" + p.Name));
-
-		return $"INSERT INTO [{tableName}] ([{columnNames}]) VALUES ({parameterNames}); SELECT CAST(SCOPE_IDENTITY() as int);";
+	public IEnumerable<T> GetColumns(IEnumerable<string> columnNames) {
+		string tableName = typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name;
+		if (columnNames == null || !columnNames.Any()) throw new ArgumentException("İstenilen sütun girilmemiş");
+		string columns = string.Join(", ", columnNames.Select(c => $"[{c}]"));
+		string query = $"SELECT {columns} FROM [{tableName}]";
+		return DbConnection.Query<T>(query);
 	}
 
+	private static string GenerateInsertQuery<TEntity>() {
+		string tableName = typeof(TEntity).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(TEntity).Name;
+		PropertyInfo[] properties = typeof(TEntity).GetProperties();
+		IEnumerable<PropertyInfo> columns = properties.Where(p => p.Name != "ID");
+		string columnNames = string.Join(", ", columns.Select(p => {
+			ColumnAttribute columnAttr = p.GetCustomAttribute<ColumnAttribute>();
+			string columnName = columnAttr != null ? columnAttr.Name : p.Name;
+			return $"[{columnName}]";
+		}));
 
-	private static string GenerateUpdateQuery() {
-		string tableName = typeof(T).Name;
+		string parameterNames = string.Join(", ", columns.Select(p => "@" + p.Name));
+		return $"INSERT INTO [{tableName}] ({columnNames}) VALUES ({parameterNames}); SELECT CAST(SCOPE_IDENTITY() as int);";
+	}
+
+	private static string GenerateUpdateQuery<TEntity>() {
+		string tableName = typeof(TEntity).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(TEntity).Name;
 		PropertyInfo[] properties = typeof(T).GetProperties();
 		IEnumerable<PropertyInfo> columns = properties.Where(p => p.Name != "ID");
 		string setClause = string.Join(", ", columns.Select(p => $"{p.Name} = @{p.Name}"));

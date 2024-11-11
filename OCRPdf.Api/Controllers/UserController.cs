@@ -1,19 +1,12 @@
-using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using OCRPdf.Data.Entities;
 using OCRPdf.Helpers;
 using OCRPdf.Service.Services;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace OCRPdf.Api.Controllers;
-[ApiController, Route("[controller]/[action]")]
-public class UserController(IServiceProvider serviceProvider, IConfiguration configuration) : ControllerBase {
-	private readonly string connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Default baðlantýya ulaþýlamadý");
+[ApiController, Route("[controller]/[action]"), Authorize]
+public class UserController(IServiceProvider serviceProvider) : ControllerBase {
 	private readonly IServiceProvider ServiceProvider = serviceProvider;
 
 	[HttpPost]
@@ -41,29 +34,27 @@ public class UserController(IServiceProvider serviceProvider, IConfiguration con
 		ServiceResponse<User> userGet = userService.GetById(id);
 		return userGet;
 	}
-	[HttpOptions]
+	[HttpGet]
 	public ServiceResponse<IEnumerable<User>> GetAll() {
 		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
 		ServiceResponse<IEnumerable<User>> userGetAll = userService.GetAll();
 		return userGetAll;
 	}
-	[HttpOptions]
+	[HttpGet]
 	public ServiceResponse<IEnumerable<User>> Filter(Dictionary<string, object> filters) {
 		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
 		ServiceResponse<IEnumerable<User>> userFiltered = userService.Filter(filters);
 		return userFiltered;
 	}
-	[HttpPost]
-	public async Task<ServiceResponse<User>> Login(string email, string password) {
-		using SqlConnection connection = new(connectionString);
-		string query = "SELECT * FROM [User] WHERE EMAIL = @Email";
-		await connection.OpenAsync();
-		User user = await connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
+	[HttpPost, AllowAnonymous]
+	public ServiceResponse<User> Login(string email, string password) {
+		Dictionary<string, object> filters = new() { { "EMAIL", email } };
+		ServiceResponse<IEnumerable<User>> user = ServiceProvider.GetService<UserService>().Filter(filters);
 		if (user == null) { return ServiceResponse<User>.ErrorResponse("Kullanýcý bulunamadý"); }
-		bool isPasswordValid = BcryptHasher.VerifyPassword(password, user.PASSWORD);
+		bool isPasswordValid = BcryptHasher.VerifyPassword(password, user.Data.First().PASSWORD);
 		if (!isPasswordValid) { return ServiceResponse<User>.ErrorResponse("Geçersiz þifre"); }
-		string token = TokenHelper.GenerateToken(user.EMAIL);
-		return ServiceResponse<User>.SuccessResponse(user, token);
+		string token = TokenHelper.GenerateToken(user.Data.First().EMAIL);
+		return ServiceResponse<User>.SuccessResponse(user.Data.First(), token);
 	}
 
 }

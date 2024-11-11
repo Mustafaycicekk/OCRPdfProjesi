@@ -1,4 +1,7 @@
-﻿namespace OCRPdf.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace OCRPdf.Data.Entities;
+[Table("TBL_OPTIMIZASYON")]
 public class Optimizasyon {
 	public int ID { get; set; }
 	public string REF { get; set; }
@@ -10,7 +13,7 @@ public class Optimizasyon {
 	public string MALZEME { get; set; }
 	public string TOPLAM_SURE { get; set; }
 	public decimal AGIRLIK { get; set; }
-	public int X { get; set; }
+	public decimal X { get; set; }
 	public decimal Y { get; set; }
 	public decimal KULLANILAN { get; set; }
 	public decimal T_SAC_K_SAC { get; set; }

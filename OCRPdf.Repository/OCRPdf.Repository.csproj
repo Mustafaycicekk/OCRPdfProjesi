@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OCRPdf.Data\OCRPdf.Data.csproj" />
+    <ProjectReference Include="..\OCRPdf.Helpers\OCRPdf.Helpers.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,7 @@
-﻿namespace OCRPdf.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace OCRPdf.Data.Entities;
+[Table("TBL_OPTIMIZASYON_SATIRLARI")]
 public class Optimizasyon_Satirlari {
 	public int ID { get; set; }
 	public int OPTIMIZASYON_ID { get; set; }

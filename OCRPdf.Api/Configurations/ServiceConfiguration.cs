@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OCRPdf.Data.Entities;
 using OCRPdf.Repository.Concrete;
 using OCRPdf.Service.Abstract;
 using OCRPdf.Service.Services;
-using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace OCRPdf.Api.Configurations {
@@ -21,14 +18,6 @@ namespace OCRPdf.Api.Configurations {
 					Version = "Version: 1.0.0.1",
 					Description = "OCR PDF General Service"
 				});
-
-				x.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme {
-					Name = "ApiKey",
-					Type = SecuritySchemeType.ApiKey,
-					In = ParameterLocation.Header,
-					Description = "Servisleri kullanabilmek için API anahtarı gereklidir. Header'da 'ApiKey' başlığına eklemelisiniz."
-				});
-
 				x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
 					Name = "Authorization",
 					Type = SecuritySchemeType.ApiKey,
@@ -44,10 +33,6 @@ namespace OCRPdf.Api.Configurations {
 						new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
 						new List<string>()
 					},
-					{
-						new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKey" } },
-						new List<string>()
-					}
 				});
 			});
 
@@ -62,8 +47,8 @@ namespace OCRPdf.Api.Configurations {
 					ValidateIssuer = false,
 					ValidateAudience = false,
 					ValidateIssuerSigningKey = true,
-					ValidIssuer = "Dersigo",
-					ValidAudience = "Dersigo App",
+					ValidIssuer = "Mustafa",
+					ValidAudience = "Mustafa App",
 					IssuerSigningKey = symmetricSecurityKey,
 					ClockSkew = TimeSpan.Zero
 				};
@@ -79,7 +64,6 @@ namespace OCRPdf.Api.Configurations {
 			services.AddScoped<OptimizasyonService>();
 			services.AddScoped<BaseService<OptimizasyonRepository, Optimizasyon>>();
 
-			// CORS Ayarları
 			services.AddCors(options => {
 				options.AddPolicy("AllowAll", builder => {
 					builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
