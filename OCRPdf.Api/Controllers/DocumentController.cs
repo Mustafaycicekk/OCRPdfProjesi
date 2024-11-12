@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OCRPdf.Data.Entities;
 using OCRPdf.Helpers;
 using OCRPdf.Service.Services;
@@ -9,7 +10,7 @@ using static OCRPdf.Helpers.PdfExtractionHelper;
 namespace OCRPdf.Api.Controllers;
 
 [ApiController, Route("[controller]/[action]")]
-//[Authorize]
+[Authorize]
 public class PdfController(IServiceProvider serviceProvider) : ControllerBase {
 	private readonly IServiceProvider ServiceProvider = serviceProvider;
 
@@ -21,7 +22,6 @@ public class PdfController(IServiceProvider serviceProvider) : ControllerBase {
 		using MemoryStream memoryStream = new();
 		file.CopyTo(memoryStream);
 		PdfDocument pdfDocument = new();
-
 		try { pdfDocument.LoadFromStream(memoryStream); } catch (Exception ex) { return ServiceResponse<object>.ErrorResponse($"PDF yüklenirken hata oluştu: {ex.Message}"); }
 
 		string outputDirectory = "Images";
@@ -34,38 +34,31 @@ public class PdfController(IServiceProvider serviceProvider) : ControllerBase {
 			using Image image = pdfDocument.SaveAsImage(pageIndex, PdfImageType.Bitmap, 500, 500);
 			using Bitmap bitmap = image as Bitmap;
 			if (bitmap != null) {
-				string imagePath = Path.Combine(outputDirectory, $"Sayfa-{pageIndex}.png");
+				string imagePath = Path.Combine(outputDirectory, $"Pdf-{pageIndex}.png");
 				bitmap.Save(imagePath, System.Drawing.Imaging.ImageFormat.Png);
 				Optimizasyon extractedData = ReadTextFromImage(imagePath, CropAreas);
 				List<Optimizasyon_Satirlari> tableData = ReadTextFromImageTableRows(imagePath, Crop);
 				ServiceProvider.GetService<OptimizasyonService>().SaveToDatabase(extractedData, tableData);
 			}
 			else {
-				return ServiceResponse<object>.ErrorResponse($"Sayfa {pageIndex} için dönüşüm başarısız.");
+				return ServiceResponse<object>.ErrorResponse($"Dönüşüm başarısız.");
 			}
 		}
 		catch (Exception ex) {
-			return ServiceResponse<object>.ErrorResponse($"Sayfa 0 için hata oluştu: {ex.Message}");
+			return ServiceResponse<object>.ErrorResponse(ex.Message);
 		}
 		return ServiceResponse<object>.SuccessResponse("Kayıt işlemi başarılı");
 	}
 	[HttpGet]
-	public ServiceResponse<IEnumerable<string>> GetByWorkAndDate() {
-		List<string> columns = ["IS", "TARIH"];
-		ServiceResponse<IEnumerable<Optimizasyon>> workAndDate = ServiceProvider.GetService<OptimizasyonService>().GetColumns(columns);
-		if (workAndDate.Success) {
-			IEnumerable<string> result = workAndDate.Data.Select(x => $"İş: {x.IS} - Tarih: {x.TARIH}");
-			return ServiceResponse<IEnumerable<string>>.SuccessResponse(result);
-		}
-		else {
-			return ServiceResponse<IEnumerable<string>>.ErrorResponse(workAndDate.Message);
-		}
+	public ServiceResponse<IEnumerable<object>> GetByWorkAndDate() {
+		List<string> columns = ["[IS]", "TARIH", "os.SIRA", "os.REFERANS", "os.SAC", "os.TOPLAM", "os.KAYIP", "os.AGIRLIK", "os.OLCULER"];
+		ServiceResponse<IEnumerable<object>> workAndDate = ServiceProvider.GetService<OptimizasyonService>().GetColumns(columns);
+		return workAndDate;
 	}
 	[HttpGet]
-	public IEnumerable<Optimizasyon> GetOptimizasyonByWeight(decimal weight) {
-		ServiceResponse<IEnumerable<Optimizasyon>> getForWeight = ServiceProvider.GetService<OptimizasyonService>().GetOptimizasyonByAgirlik(weight);
-		if (getForWeight.Success) { return getForWeight.Data; }
-		else { return null; }
+	public ServiceResponse<IEnumerable<Optimizasyon>> GetOptimizasyonByWeight(decimal weight) {
+		ServiceResponse<IEnumerable<Optimizasyon>> getForWeight = ServiceProvider.GetService<OptimizasyonService>().GetOptimizasyonByWeight(weight);
+		return getForWeight;
 	}
 
 

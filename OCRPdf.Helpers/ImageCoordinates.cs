@@ -11,7 +11,7 @@ public static class ImageCoordinates {
 			new Rectangle(1059, 2934, 650, 130), // MALZEME
 			new Rectangle(1059, 2830, 650, 130), // MAKINA
 			new Rectangle(1059, 3069, 650, 130), // TOPLAM SURE
-			new Rectangle(3085, 2833, 200, 130), // AĞIRLIK
+			new Rectangle(3085, 2833, 250, 130), // AĞIRLIK
 			new Rectangle(3085, 2934, 300, 130), // X
 			new Rectangle(3085, 3079, 300, 130), // Y 
 			new Rectangle(3085, 3185, 300, 130), // KULLANILAN

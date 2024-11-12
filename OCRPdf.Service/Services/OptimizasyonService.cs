@@ -14,14 +14,24 @@ public class OptimizasyonService(OptimizasyonRepository repository) : BaseServic
 			ServiceResponse<Optimizasyon>.ErrorResponse(ex.Message);
 		}
 	}
-	public ServiceResponse<IEnumerable<Optimizasyon>> GetOptimizasyonByAgirlik(decimal agirlik) {
+	public ServiceResponse<IEnumerable<Optimizasyon>> GetOptimizasyonByWeight(decimal agirlik) {
 		try {
-			IEnumerable<Optimizasyon> result = Repository.GetOptimizasyonByAgirlik(agirlik);
+			IEnumerable<Optimizasyon> result = Repository.GetOptimizasyonByWeight(agirlik);
 			if (result != null && result.Any()) { return ServiceResponse<IEnumerable<Optimizasyon>>.SuccessResponse(result); }
 			else { return ServiceResponse<IEnumerable<Optimizasyon>>.ErrorResponse("Girilen ağırlığa eşit ve daha yüksek bir kayıt bulunamadı."); }
 		}
 		catch (Exception ex) {
 			return ServiceResponse<IEnumerable<Optimizasyon>>.ErrorResponse(ex.Message);
+		}
+	}
+	public ServiceResponse<IEnumerable<object>> GetColumns(List<string> columns) {
+		try {
+			IEnumerable<object> result = Repository.GetColumns(columns);
+			if (result != null && result.Any()) { return ServiceResponse<IEnumerable<object>>.SuccessResponse(result); }
+			else { return ServiceResponse<IEnumerable<object>>.ErrorResponse("Veri bulunamadı."); }
+		}
+		catch (Exception ex) {
+			return ServiceResponse<IEnumerable<object>>.ErrorResponse(ex.Message);
 		}
 	}
 

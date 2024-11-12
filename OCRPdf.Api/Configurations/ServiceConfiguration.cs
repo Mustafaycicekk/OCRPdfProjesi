@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OCRPdf.Data.Entities;
+using OCRPdf.Repository.Abstract;
 using OCRPdf.Repository.Concrete;
 using OCRPdf.Service.Abstract;
 using OCRPdf.Service.Services;
@@ -20,7 +21,7 @@ namespace OCRPdf.Api.Configurations {
 				});
 				x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
 					Name = "Authorization",
-					Type = SecuritySchemeType.ApiKey,
+					Type = SecuritySchemeType.Http,
 					In = ParameterLocation.Header,
 					Scheme = "Bearer",
 					BearerFormat = "JWT",
@@ -50,7 +51,7 @@ namespace OCRPdf.Api.Configurations {
 					ValidIssuer = "Mustafa",
 					ValidAudience = "Mustafa App",
 					IssuerSigningKey = symmetricSecurityKey,
-					ClockSkew = TimeSpan.Zero
+					ClockSkew = TimeSpan.Zero,
 				};
 			});
 
@@ -63,7 +64,10 @@ namespace OCRPdf.Api.Configurations {
 			services.AddScoped<OptimizasyonRepository>();
 			services.AddScoped<OptimizasyonService>();
 			services.AddScoped<BaseService<OptimizasyonRepository, Optimizasyon>>();
-
+			
+			
+			
+			
 			services.AddCors(options => {
 				options.AddPolicy("AllowAll", builder => {
 					builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();

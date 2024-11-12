@@ -8,52 +8,45 @@ namespace OCRPdf.Api.Controllers;
 [ApiController, Route("[controller]/[action]"), Authorize]
 public class UserController(IServiceProvider serviceProvider) : ControllerBase {
 	private readonly IServiceProvider ServiceProvider = serviceProvider;
-
 	[HttpPost]
 	public ServiceResponse<User> Add(User user) {
 		user.PASSWORD = BcryptHasher.HashPassword(user.PASSWORD);
-		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
-		ServiceResponse<User> userAdded = userService.Add(user);
-		return userAdded;
+		ServiceResponse<User> userResponse = ServiceProvider.GetService<UserService>().Add(user);
+		return userResponse;
 	}
 	[HttpDelete]
 	public ServiceResponse<User> Delete(int id) {
-		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
-		ServiceResponse<User> userDeleted = userService.Delete(id);
-		return userDeleted;
+		ServiceResponse<User> userResponse = ServiceProvider.GetService<UserService>().Delete(id);
+		return userResponse;
 	}
 	[HttpPut]
 	public ServiceResponse<User> Update(User user) {
-		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
-		ServiceResponse<User> userUpdated = userService.Update(user);
-		return userUpdated;
+		ServiceResponse<User> userResponse = ServiceProvider.GetService<UserService>().Update(user);
+		return userResponse;
 	}
 	[HttpGet]
 	public ServiceResponse<User> Get(int id) {
-		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
-		ServiceResponse<User> userGet = userService.GetById(id);
-		return userGet;
+		ServiceResponse<User> userResponse = ServiceProvider.GetService<UserService>().GetById(id);
+		return userResponse;
 	}
 	[HttpGet]
 	public ServiceResponse<IEnumerable<User>> GetAll() {
-		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
-		ServiceResponse<IEnumerable<User>> userGetAll = userService.GetAll();
-		return userGetAll;
+		ServiceResponse<IEnumerable<User>> userResponse = ServiceProvider.GetService<UserService>().GetAll();
+		return userResponse;
 	}
-	[HttpGet]
-	public ServiceResponse<IEnumerable<User>> Filter(Dictionary<string, object> filters) {
-		UserService userService = ServiceProvider.GetService<UserService>() ?? throw new InvalidOperationException("Service de hata");
-		ServiceResponse<IEnumerable<User>> userFiltered = userService.Filter(filters);
-		return userFiltered;
+	[HttpPost]
+	public ServiceResponse<IEnumerable<User>> Filter([FromBody]Dictionary<string, object> filters) {
+		ServiceResponse<IEnumerable<User>> userResponse = ServiceProvider.GetService<UserService>().Filter(filters);
+		return userResponse;
 	}
 	[HttpPost, AllowAnonymous]
-	public ServiceResponse<User> Login(string email, string password) {
-		Dictionary<string, object> filters = new() { { "EMAIL", email } };
+	public ServiceResponse<User> Login(string userName, string password) {
+		Dictionary<string, object> filters = new() { { "KULLANICI_ADI", userName } };
 		ServiceResponse<IEnumerable<User>> user = ServiceProvider.GetService<UserService>().Filter(filters);
 		if (user == null) { return ServiceResponse<User>.ErrorResponse("Kullanýcý bulunamadý"); }
 		bool isPasswordValid = BcryptHasher.VerifyPassword(password, user.Data.First().PASSWORD);
 		if (!isPasswordValid) { return ServiceResponse<User>.ErrorResponse("Geçersiz þifre"); }
-		string token = TokenHelper.GenerateToken(user.Data.First().EMAIL);
+		string token = TokenHelper.GenerateToken(user.Data.First().KULLANICI_ADI);
 		return ServiceResponse<User>.SuccessResponse(user.Data.First(), token);
 	}
 

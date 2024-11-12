@@ -15,9 +15,14 @@ public class OptimizasyonRepository : DapperRepository<Optimizasyon> {
 			Add(satir);
 		}
 	}
-	public IEnumerable<Optimizasyon> GetOptimizasyonByAgirlik(decimal agirlik) {
+	public IEnumerable<Optimizasyon> GetOptimizasyonByWeight(decimal agirlik) {
 		string query = "SELECT * FROM [TBL_OPTIMIZASYON] WHERE AGIRLIK >= @Agirlik";
 		return DbConnection.Query<Optimizasyon>(query, new { Agirlik = agirlik });
 	}
+	public IEnumerable<object> GetColumns(List<string> columns) {
+		string query = $"SELECT {string.Join(",", columns)} FROM [TBL_OPTIMIZASYON] o RIGHT JOIN [TBL_OPTIMIZASYON_SATIRLARI] os on o.ID = os.OPTIMIZASYON_ID";
+		return DbConnection.Query<object>(query);
+	}
+
 
 }

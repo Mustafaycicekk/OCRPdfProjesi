@@ -10,6 +10,6 @@ public class Optimizasyon_Satirlari {
 	public int SAC { get; set; }
 	public int TOPLAM { get; set; }
 	public int KAYIP { get; set; }
-	public string AGIRLIK { get; set; }
+	public decimal AGIRLIK { get; set; }
 	public string OLCULER { get; set; }
 }
