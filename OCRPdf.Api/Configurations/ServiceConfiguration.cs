@@ -11,13 +11,14 @@ using System.Text;
 namespace OCRPdf.Api.Configurations {
 	public static class ServiceConfiguration {
 		public static void ConfigureServices(this IServiceCollection services) {
-			services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+			services.AddControllers();
 
+			#region Swagger
 			services.AddSwaggerGen(x => {
 				x.SwaggerDoc("v1", new OpenApiInfo {
 					Title = "OCR PDF REST API",
-					Version = "Version: 1.0.0.1",
-					Description = "OCR PDF General Service"
+					Version = "v1",
+					Description = "OCR PDF Service"
 				});
 				x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
 					Name = "Authorization",
@@ -36,7 +37,8 @@ namespace OCRPdf.Api.Configurations {
 					},
 				});
 			});
-
+			#endregion
+			#region JWT
 			SymmetricSecurityKey symmetricSecurityKey = new(Encoding.UTF8.GetBytes("fgai2cWFRU7lyuWSl9ZKHHCS6vWDJuBIcexzgl4lRz2wsbiIEG3Ks9fYjbK888Yl"));
 			services.AddAuthentication(options => {
 				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -54,26 +56,16 @@ namespace OCRPdf.Api.Configurations {
 					ClockSkew = TimeSpan.Zero,
 				};
 			});
-
+			#endregion
 			services.AddAuthorization();
-
 			// Servisler
 			services.AddScoped<UserRepository>();
+			
 			services.AddScoped<UserService>();
 			services.AddScoped<BaseService<UserRepository, User>>();
 			services.AddScoped<OptimizasyonRepository>();
 			services.AddScoped<OptimizasyonService>();
 			services.AddScoped<BaseService<OptimizasyonRepository, Optimizasyon>>();
-			
-			
-			
-			
-			services.AddCors(options => {
-				options.AddPolicy("AllowAll", builder => {
-					builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-				});
-			});
-
 			services.AddEndpointsApiExplorer();
 		}
 	}

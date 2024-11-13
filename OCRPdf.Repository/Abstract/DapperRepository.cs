@@ -5,9 +5,13 @@ using System.Reflection;
 using static Dapper.SqlMapper;
 
 namespace OCRPdf.Repository.Abstract;
-public class DapperRepository<T>(IDbConnection dbConnection) : IRepository<T> where T : class {
-	protected readonly IDbConnection DbConnection = dbConnection;
+public class DapperRepository<T> : IRepository<T> where T : class {
+	protected readonly IDbConnection DbConnection;
+	public DapperRepository() { }
 
+	public DapperRepository(IDbConnection dbConnection) {
+		DbConnection = dbConnection;
+	}
 	public int Add<TEntity>(TEntity entity) {
 		string query = GenerateInsertQuery<TEntity>();
 		return DbConnection.QuerySingle<int>(query, entity);

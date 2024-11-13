@@ -3,7 +3,7 @@ using OCRPdf.Repository.Abstract;
 
 namespace OCRPdf.Service.Abstract;
 public class BaseService<TRepository, TEntity>(TRepository repository) : IBaseService<TEntity> where TRepository : IRepository<TEntity>, new() where TEntity : class, new() {
-	protected TRepository Repository { get; set; } = repository ?? throw new ArgumentNullException(nameof(repository));
+	protected TRepository Repository { get; set; } = repository;
 
 	public ServiceResponse<TEntity> Add(TEntity entity) {
 		try {

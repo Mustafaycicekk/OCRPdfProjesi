@@ -5,7 +5,9 @@ using Tesseract;
 
 namespace OCRPdf.Helpers;
 public static class PdfExtractionHelper {
-	private static TesseractEngine GetTesseractEngine() { return new TesseractEngine(@"./tessdata", "tur", EngineMode.Default); }
+	private static TesseractEngine GetTesseractEngine() { 
+		return new TesseractEngine(@"./tessdata", "tur", EngineMode.Default); 
+	}
 
 	public static Optimizasyon ReadTextFromImage(string imagePath, List<Rectangle> cropAreas) {
 		using Bitmap bitmap = new(imagePath);

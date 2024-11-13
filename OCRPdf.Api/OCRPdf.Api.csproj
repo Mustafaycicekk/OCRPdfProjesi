@@ -11,7 +11,6 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.1" />
-		<PackageReference Include="PDFsharp" Version="6.1.1" />
 		<PackageReference Include="Spire.PDF" Version="10.11.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.10" />
@@ -20,5 +19,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\OCRPdf.Service\OCRPdf.Service.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Model\" />
 	</ItemGroup>
 </Project>

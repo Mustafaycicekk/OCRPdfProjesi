@@ -6,6 +6,7 @@ using OCRPdf.Service.Services;
 using Spire.Pdf;
 using Spire.Pdf.Graphics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using static OCRPdf.Helpers.PdfExtractionHelper;
 namespace OCRPdf.Api.Controllers;
 
@@ -35,7 +36,7 @@ public class PdfController(IServiceProvider serviceProvider) : ControllerBase {
 			using Bitmap bitmap = image as Bitmap;
 			if (bitmap != null) {
 				string imagePath = Path.Combine(outputDirectory, $"Pdf-{pageIndex}.png");
-				bitmap.Save(imagePath, System.Drawing.Imaging.ImageFormat.Png);
+				bitmap.Save(imagePath, ImageFormat.Png);
 				Optimizasyon extractedData = ReadTextFromImage(imagePath, CropAreas);
 				List<Optimizasyon_Satirlari> tableData = ReadTextFromImageTableRows(imagePath, Crop);
 				ServiceProvider.GetService<OptimizasyonService>().SaveToDatabase(extractedData, tableData);

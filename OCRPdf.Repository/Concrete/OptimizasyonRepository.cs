@@ -5,8 +5,8 @@ using System.Data;
 
 namespace OCRPdf.Repository.Concrete;
 public class OptimizasyonRepository : DapperRepository<Optimizasyon> {
+	public OptimizasyonRepository() { }
 	public OptimizasyonRepository(IDbConnection dbConnection) : base(dbConnection) { }
-	public OptimizasyonRepository() : base(null) { }
 
 	public void SaveToDatabase(Optimizasyon optimizasyon, List<Optimizasyon_Satirlari> optimizasyonSatirlari) {
 		int optimizasyonAdded = Add(optimizasyon);
@@ -15,14 +15,17 @@ public class OptimizasyonRepository : DapperRepository<Optimizasyon> {
 			Add(satir);
 		}
 	}
-	public IEnumerable<Optimizasyon> GetOptimizasyonByWeight(decimal agirlik) {
-		string query = "SELECT * FROM [TBL_OPTIMIZASYON] WHERE AGIRLIK >= @Agirlik";
-		return DbConnection.Query<Optimizasyon>(query, new { Agirlik = agirlik });
-	}
+
 	public IEnumerable<object> GetColumns(List<string> columns) {
 		string query = $"SELECT {string.Join(",", columns)} FROM [TBL_OPTIMIZASYON] o RIGHT JOIN [TBL_OPTIMIZASYON_SATIRLARI] os on o.ID = os.OPTIMIZASYON_ID";
 		return DbConnection.Query<object>(query);
 	}
-
-
+	public IEnumerable<Optimizasyon> GetOptimizasyonByWeight(decimal weightThreshold) {
+		string query = @"WITH AgirlikToplamlari AS (SELECT SUM(os.AGIRLIK) AS [agirlik toplam], o.ID FROM TBL_OPTIMIZASYON_SATIRLARI os JOIN TBL_OPTIMIZASYON o ON o.ID = os.OPTIMIZASYON_ID GROUP BY o.ID )
+				  SELECT o.*
+				  FROM TBL_OPTIMIZASYON o
+				  JOIN AgirlikToplamlari a ON o.ID = a.ID
+				  WHERE a.[agirlik toplam] > @WeightThreshold; ";
+		return DbConnection.Query<Optimizasyon>(query, new { WeightThreshold = weightThreshold });
+	}
 }
