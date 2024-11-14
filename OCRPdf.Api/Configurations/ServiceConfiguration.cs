@@ -2,7 +2,6 @@
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OCRPdf.Data.Entities;
-using OCRPdf.Repository.Abstract;
 using OCRPdf.Repository.Concrete;
 using OCRPdf.Service.Abstract;
 using OCRPdf.Service.Services;
@@ -11,7 +10,7 @@ using System.Text;
 namespace OCRPdf.Api.Configurations {
 	public static class ServiceConfiguration {
 		public static void ConfigureServices(this IServiceCollection services) {
-			services.AddControllers();
+			services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore); ;
 
 			#region Swagger
 			services.AddSwaggerGen(x => {
@@ -60,7 +59,7 @@ namespace OCRPdf.Api.Configurations {
 			services.AddAuthorization();
 			// Servisler
 			services.AddScoped<UserRepository>();
-			
+
 			services.AddScoped<UserService>();
 			services.AddScoped<BaseService<UserRepository, User>>();
 			services.AddScoped<OptimizasyonRepository>();

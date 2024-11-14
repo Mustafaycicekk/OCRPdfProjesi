@@ -21,6 +21,7 @@ public class UserController(IServiceProvider serviceProvider) : ControllerBase {
 	}
 	[HttpPut]
 	public ServiceResponse<User> Update(User user) {
+		user.PASSWORD = BcryptHasher.HashPassword(user.PASSWORD);
 		ServiceResponse<User> userResponse = ServiceProvider.GetService<UserService>().Update(user);
 		return userResponse;
 	}
