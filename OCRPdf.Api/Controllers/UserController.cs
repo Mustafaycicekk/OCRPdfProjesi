@@ -8,7 +8,7 @@ namespace OCRPdf.Api.Controllers;
 [ApiController, Route("[controller]/[action]"), Authorize]
 public class UserController(IServiceProvider serviceProvider) : ControllerBase {
 	private readonly IServiceProvider ServiceProvider = serviceProvider;
-	[HttpPost]
+	[HttpPost, AllowAnonymous] 
 	public ServiceResponse<User> Add(User user) {
 		user.PASSWORD = BcryptHasher.HashPassword(user.PASSWORD);
 		ServiceResponse<User> userResponse = ServiceProvider.GetService<UserService>().Add(user);
